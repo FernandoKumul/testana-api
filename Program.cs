@@ -1,3 +1,6 @@
+using testana_api.Data;
+using testana_api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +9,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSqlServer<AppDBContext>(builder.Configuration.GetConnectionString("DBConnection"));
+
+//Service Layer
+builder.Services.AddScoped<TestService>();
 
 var app = builder.Build();
 
