@@ -186,7 +186,9 @@ public partial class AppDBContext : DbContext
             entity.Property(e => e.Likes).HasColumnName("likes");
             entity.Property(e => e.Random).HasColumnName("random");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Tags).HasColumnName("tags");
+            entity.Property(e => e.Tags)
+                .IsUnicode(false)
+                .HasColumnName("tags");
             entity.Property(e => e.Title)
                 .HasMaxLength(100)
                 .IsUnicode(false)

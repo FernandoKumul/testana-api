@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace testana_api.Data.Models;
 
@@ -27,5 +28,6 @@ public partial class Question
 
     public virtual QuestionType QuestionType { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual Test Test { get; set; } = null!;
 }
