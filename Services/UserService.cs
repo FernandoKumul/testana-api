@@ -18,11 +18,25 @@ namespace testana_api.Services
 
         public async Task<IEnumerable<User>> GetAll()
         {
-            return await _context.Users.ToListAsync();
+            try
+            {
+                return await _context.Users.ToListAsync();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error al obtener los registros: {e.Message}");
+            }
         }
         public async Task<User?> GetbyId(int id)
         {
-            return await _context.Users.FindAsync(id);
+            try
+            {
+                return await _context.Users.FindAsync(id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error al obtener el registro: {e.Message}");
+            }
         }
         public async Task<Response<User>> Create(UserDto user)
         {
@@ -31,7 +45,7 @@ namespace testana_api.Services
                 Name = user.Name,
                 Email = user.Email,
                 Password = user.Password,
-                Avatar = user.Avatar
+                Avatar = ""
             };
             try
             {
