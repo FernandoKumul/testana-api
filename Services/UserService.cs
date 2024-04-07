@@ -46,7 +46,7 @@ namespace testana_api.Services
         }
         public async Task<Response<User>> Update(User user)
         {
-            var existingUser = await _context.Users.FindAsync(user.Id);
+            var existingUser = await GetbyId(user.Id);
             if (existingUser == null)
             {
                 return new Response<User>(false, "Registro no encontrado", null);
@@ -57,13 +57,31 @@ namespace testana_api.Services
                 existingUser.Email = user.Email;
                 existingUser.Password = user.Password;
                 existingUser.Avatar = user.Avatar;
-                
+
                 await _context.SaveChangesAsync();
                 return new Response<User>(true, "Registro Actualizado", user);
             }
             catch (Exception e)
             {
                 throw new Exception($"Error al actualizar el registro: {e.Message}");
+            }
+        }
+        public async Task<Response<User>> Delete(int id)
+        {
+            var user = await GetbyId(id);
+            try
+            {
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+                return new Response<User>(true, "Registro Eliminado", user);
+            }
+            catch (Exception e)
+            {
+                if (user is null)
+                {
+                    return new Response<User>(false, "Registro no encontrado", null);
+                }
+                throw new Exception($"Error al eliminar el registro: {e.Message}");
             }
         }
     }

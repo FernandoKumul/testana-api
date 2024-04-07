@@ -44,7 +44,18 @@ namespace testana_api.Controllers{
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, User user)
         {
+            if (id != user.Id)
+            {
+                return BadRequest();
+            }
             var result = await _service.Update(user);
+            return Ok(result);
+        }
+        // Delete for delete a specific user in the table Users in tha database testana
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _service.Delete(id);
             return Ok(result);
         }
     }
