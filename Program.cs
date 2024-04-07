@@ -14,6 +14,7 @@ builder.Services.AddSqlServer<AppDBContext>(builder.Configuration.GetConnectionS
 
 //Service Layer
 builder.Services.AddScoped<TestService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
