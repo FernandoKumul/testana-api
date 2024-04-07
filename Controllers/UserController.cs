@@ -1,10 +1,12 @@
 using ApplicationCore.DTOs.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
 
 namespace testana_api.Controllers{
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase

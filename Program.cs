@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using testana_api.Data;
 using testana_api.Services;
 
@@ -15,6 +18,19 @@ builder.Services.AddSqlServer<AppDBContext>(builder.Configuration.GetConnectionS
 //Service Layer
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LoginService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+    options => {
+        options.TokenValidationParameters = new TokenValidationParameters {
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("JWT:Key").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    } 
+);
 
 var app = builder.Build();
 
@@ -26,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

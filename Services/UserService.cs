@@ -22,6 +22,7 @@ namespace testana_api.Services
             {
                 return await _context.Users.ToListAsync();
             }
+        
             catch (Exception e)
             {
                 throw new Exception($"Error al obtener los registros: {e.Message}");
