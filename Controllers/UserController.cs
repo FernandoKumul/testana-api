@@ -39,6 +39,13 @@ namespace testana_api.Controllers{
         {
             var result = await _service.Create(user);
             return Ok(result);
-        } 
+        }
+        // Put for update a specific user in the table Users in tha database testana
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, User user)
+        {
+            var result = await _service.Update(user);
+            return Ok(result);
+        }
     }
 }

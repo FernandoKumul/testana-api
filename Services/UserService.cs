@@ -1,5 +1,6 @@
 using ApplicationCore.DTOs.User;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using testana_api.Data;
 using testana_api.Data.Models;
@@ -41,6 +42,28 @@ namespace testana_api.Services
             catch (Exception e)
             {
                 throw new Exception($"Error al crear el registro: {e.Message}");
+            }
+        }
+        public async Task<Response<User>> Update(User user)
+        {
+            var existingUser = await _context.Users.FindAsync(user.Id);
+            if (existingUser == null)
+            {
+                return new Response<User>(false, "Registro no encontrado", null);
+            }
+            try
+            {
+                existingUser.Name = user.Name;
+                existingUser.Email = user.Email;
+                existingUser.Password = user.Password;
+                existingUser.Avatar = user.Avatar;
+                
+                await _context.SaveChangesAsync();
+                return new Response<User>(true, "Registro Actualizado", user);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error al actualizar el registro: {e.Message}");
             }
         }
     }
