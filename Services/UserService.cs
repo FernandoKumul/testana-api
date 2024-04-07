@@ -20,7 +20,7 @@ namespace testana_api.Services
         {
             return await _context.Users.ToListAsync();
         }
-        public async Task<User> GetbyId(int id)
+        public async Task<User?> GetbyId(int id)
         {
             return await _context.Users.FindAsync(id);
         }
@@ -44,7 +44,7 @@ namespace testana_api.Services
                 throw new Exception($"Error al crear el registro: {e.Message}");
             }
         }
-        public async Task<Response<User>> Update(User user)
+        public async Task<Response<User>> Update(UserDto user)
         {
             var existingUser = await GetbyId(user.Id);
             if (existingUser == null)
@@ -59,7 +59,7 @@ namespace testana_api.Services
                 existingUser.Avatar = user.Avatar;
 
                 await _context.SaveChangesAsync();
-                return new Response<User>(true, "Registro Actualizado", user);
+                return new Response<User>(true, "Registro Actualizado", existingUser);
             }
             catch (Exception e)
             {

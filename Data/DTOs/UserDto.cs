@@ -9,9 +9,15 @@ namespace ApplicationCore.DTOs.User
 {
     public class UserDto
     {
+        public int Id { get; set; }
+        [MaxLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres.")]
         public string Name { get; set; } = null!;
+        [MaxLength(50, ErrorMessage = "El correo no puede tener más de 50 caracteres.")]
+        [EmailAddress(ErrorMessage = "El formato del correo no es válido.")]
         public string Email { get; set; } = null!;
+        [MaxLength(20, ErrorMessage = "La contraseña no puede tener más de 20 caracteres.")]
         public string Password { get; set; } = null!;
+
         public string Avatar { get; set; } = null!;
     }
 }
