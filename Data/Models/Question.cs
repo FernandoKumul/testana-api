@@ -24,7 +24,7 @@ public partial class Question
 
     public int? Duration { get; set; }
 
-    public virtual ICollection<QuestionAnswer> QuestionAnswers { get; set; } = new List<QuestionAnswer>();
+    public virtual ICollection<QuestionAnswer> Answers { get; set; } = new List<QuestionAnswer>();
 
     public virtual QuestionType QuestionType { get; set; } = null!;
 

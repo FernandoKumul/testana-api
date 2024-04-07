@@ -122,7 +122,7 @@ public partial class AppDBContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("text");
 
-            entity.HasOne(d => d.Question).WithMany(p => p.QuestionAnswers)
+            entity.HasOne(d => d.Question).WithMany(p => p.Answers)
                 .HasForeignKey(d => d.QuestionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_QuestionAnswers.questionId");

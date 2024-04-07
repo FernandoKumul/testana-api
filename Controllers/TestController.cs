@@ -23,6 +23,24 @@ namespace testana_api.Controllers
             return Ok(new Response<IEnumerable<Test>>(true, "Datos obtenidos exitosamente", tests));
         }
 
+        [HttpGet("questions-answers/{id}")]
+        public async Task<IActionResult> GetByIdQuestionsAnswers(int id)
+        {
+            try
+            {
+                var test = await _service.GetByIdWithQuestionsAndAnswers(id);
+                if(test is null) 
+                {
+                    return NotFound(new Response<string>(false, $"Test no encontrado con el id {id}"));
+                }
+
+                return Ok(new Response<Test>(true, "Datos obtenidos exitosamente", test));
+            } catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<Response<Test>>> Create([FromBody] TestInDTO test)
         {
@@ -33,12 +51,12 @@ namespace testana_api.Controllers
                 for (int i = 0; i < test.Questions.Count; i++)
                 {
                     int nCorrect = 0;
-                    foreach(var answer in test.Questions[i].Answers)
+                    foreach (var answer in test.Questions[i].Answers)
                     {
                         if (answer.Correct) nCorrect++;
                     }
-                    
-                    if(nCorrect != 1) {
+
+                    if (nCorrect != 1) {
                         return BadRequest(new Response<string>(false, $"La pregunta[{i}] no tiene ninguna respuesta correcta"));
                     }
                 }
@@ -49,16 +67,35 @@ namespace testana_api.Controllers
                     BadRequest(new Response<int>(false, "No está ingresando algún tipo de visibilidad valido"));
                 }
 
-                string[] colors = { "green", "blue", "purple", "orange", "yellow", "red" };    
-                
+                string[] colors = { "green", "blue", "purple", "orange", "yellow", "red" };
+
                 if (!Array.Exists(colors, color => color == test.Color))
                 {
                     BadRequest(new Response<int>(false, "No está ingresando algún color valido"));
                 }
-                
+
                 //Agregar en la función
                 var newTest = await _service.Create(test);
                 return Created("created test", new Response<Test>(true, "Test creado con exito", newTest));
+            } catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Response<string>>> Delete (int id)
+        {
+            try
+            {
+                var result = await _service.DeleteById(id);
+
+                if (!result)
+                {
+                    return NotFound(new Response<string>(false, $"El test con el id {id} no existe"));
+                }
+
+                return Ok(new Response<string>(true, "Test borrado de manera exitosa"));
             } catch (Exception ex)
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
