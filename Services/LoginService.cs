@@ -15,20 +15,16 @@ namespace testana_api.Services
         {
             _context = context;
         }
-        public async Task<Response<User>> Login(LoginDto login)
+        public async Task<User?> Login(LoginDto login)
         {
             try
             {
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == login.Email && u.Password == login.Password);
-                if (user == null)
-                {
-                    return new Response<User>(false, "Correo o contraseña incorrectos", null);
-                }
-                return new Response<User>(true, "Inicio de sesión exitoso", user);
+                return user;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error al iniciar sesión: {e.Message}");
+                throw new Exception($"Error al iniciar sesión: {e.Message}", e.InnerException);
             }
         }
     }

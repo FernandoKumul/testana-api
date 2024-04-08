@@ -25,10 +25,21 @@ namespace testana_api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto login)
         {
-            var result = await _service.Login(login);
+            try
+            {
+                var user = await _service.Login(login);
 
-            string token = GenerateToken(result.Data);
-            return Ok(new { token = token });
+                if(user == null)
+                {
+                    return BadRequest(new Response<User>(false, "Correo o contraseña incorrectos"));
+                }
+
+                string token = GenerateToken(user);
+                return Ok(new Response<object>(true, "Inicio de sesión exitoso", new { token }));
+            } catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
+            }
         }
 
         private string GenerateToken(User user)
