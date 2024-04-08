@@ -33,7 +33,7 @@ public partial class Test
 
     public int Dislikes { get; set; }
 
-    public int Tags { get; set; }
+    public string Tags { get; set; } = null!;
 
     public virtual ICollection<Collaborator> Collaborators { get; set; } = new List<Collaborator>();
 
