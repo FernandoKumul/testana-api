@@ -1,4 +1,5 @@
-﻿using testana_api.Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using testana_api.Data.Models;
 
 namespace testana_api.Data.DTOs
 {
@@ -6,8 +7,10 @@ namespace testana_api.Data.DTOs
     {
         public int UserId { get; set; }
 
+        [Required(ErrorMessage = "El titulo de la pregunta es obligatoria")]
         public string Title { get; set; } = null!;
 
+        [Required(ErrorMessage = "La descripción de la pregunta es obligatoria")]
         public string Description { get; set; } = null!;
 
         public string Color { get; set; } = null!;

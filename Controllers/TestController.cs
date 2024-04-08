@@ -83,7 +83,7 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
             }
         }
-        [HttpPut("{id}")]
+        [HttpPut("questions-answers/{id}")]
         public async Task<ActionResult<Response<string>>> Update (int id, [FromBody] TestInUpdateDTO updateTest)
         {
             for (int i = 0; i < updateTest.Questions.Count; i++)

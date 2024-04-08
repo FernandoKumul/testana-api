@@ -1,10 +1,13 @@
-﻿namespace testana_api.Data.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace testana_api.Data.DTOs
 {
     public class TestInUpdateDTO
     {
-
+        [Required(ErrorMessage = "El titulo de la pregunta es obligatoria")]
         public string Title { get; set; } = null!;
-
+        
+        [Required(ErrorMessage = "La descripción de la pregunta es obligatoria")]
         public string Description { get; set; } = null!;
 
         public string Color { get; set; } = null!;
