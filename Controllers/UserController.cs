@@ -5,6 +5,7 @@ using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
 
+
 namespace testana_api.Controllers{
     [Authorize]
     [ApiController]
@@ -64,5 +65,6 @@ namespace testana_api.Controllers{
             var result = await _service.Delete(id);
             return Ok(result);
         }
+
     }
 }

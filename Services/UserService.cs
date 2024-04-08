@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using testana_api.Data;
 using testana_api.Data.Models;
 using testana_api.Utilities;
+using System.Security.Cryptography;
+using System.Text;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace testana_api.Services
 {
@@ -22,7 +26,7 @@ namespace testana_api.Services
             {
                 return await _context.Users.ToListAsync();
             }
-        
+
             catch (Exception e)
             {
                 throw new Exception($"Error al obtener los registros: {e.Message}");
@@ -41,15 +45,21 @@ namespace testana_api.Services
         }
         public async Task<Response<User>> Create(UserDto user)
         {
-            var newUser = new User
+            var existingEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (existingEmail != null)
             {
-                Name = user.Name,
-                Email = user.Email,
-                Password = user.Password,
-                Avatar = ""
-            };
+                return new Response<User>(false, "El correo ya está registrado", null);
+            }
+
             try
             {
+                var newUser = new User
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Password = EncryptString(user.Password),
+                    Avatar = ""
+                };
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
                 return new Response<User>(true, "Registro Creado", newUser);
@@ -70,7 +80,7 @@ namespace testana_api.Services
             {
                 existingUser.Name = user.Name;
                 existingUser.Email = user.Email;
-                existingUser.Password = user.Password;
+                existingUser.Password = EncryptString(user.Password);
                 existingUser.Avatar = user.Avatar;
 
                 await _context.SaveChangesAsync();
@@ -84,6 +94,10 @@ namespace testana_api.Services
         public async Task<Response<User>> Delete(int id)
         {
             var user = await GetbyId(id);
+            if (user is null)
+            {
+                return new Response<User>(false, "Registro no encontrado", null);
+            }
             try
             {
                 _context.Users.Remove(user);
@@ -92,11 +106,21 @@ namespace testana_api.Services
             }
             catch (Exception e)
             {
-                if (user is null)
-                {
-                    return new Response<User>(false, "Registro no encontrado", null);
-                }
                 throw new Exception($"Error al eliminar el registro: {e.Message}");
+            }
+        }
+
+        public static string EncryptString(string str)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(str));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
             }
         }
     }
