@@ -122,7 +122,7 @@ public partial class AppDBContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("text");
 
-            entity.HasOne(d => d.Question).WithMany(p => p.Answers)
+            entity.HasOne(d => d.Question).WithMany(p => p.QuestionAnswers)
                 .HasForeignKey(d => d.QuestionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_QuestionAnswers.questionId");
@@ -186,9 +186,7 @@ public partial class AppDBContext : DbContext
             entity.Property(e => e.Likes).HasColumnName("likes");
             entity.Property(e => e.Random).HasColumnName("random");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Tags)
-                .IsUnicode(false)
-                .HasColumnName("tags");
+            entity.Property(e => e.Tags).HasColumnName("tags");
             entity.Property(e => e.Title)
                 .HasMaxLength(100)
                 .IsUnicode(false)
