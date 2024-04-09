@@ -1,28 +1,32 @@
+using System;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
 using ApplicationCore.DTOs.Login;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using ApplicationCore.DTOs.User;
 
 namespace testana_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LoginController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly LoginService _service;
+        private readonly AuthService _service;
         private IConfiguration config;
 
-        public LoginController(LoginService service, IConfiguration configuration)
+        public AuthController(AuthService service, IConfiguration configuration)
         {
             _service = service;
             config = configuration;
         }
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto login)
         {
             try
@@ -31,17 +35,29 @@ namespace testana_api.Controllers
 
                 if(user == null)
                 {
-                    return BadRequest(new Response<User>(false, "Correo o contraseña incorrectos"));
+                    return BadRequest(new Response<User>(false, "Correo o contraseï¿½a incorrectos"));
                 }
 
                 string token = GenerateToken(user);
-                return Ok(new Response<object>(true, "Inicio de sesión exitoso", new { token }));
+                return Ok(new Response<object>(true, "Inicio de sesiï¿½n exitoso", new { token }));
             } catch (Exception ex)
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
-
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserDto user)
+        {
+            try
+            {
+                var result = await _service.Register(user);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
+            }
+        }
         private string GenerateToken(User user)
         {
             var claims = new[]
@@ -50,7 +66,7 @@ namespace testana_api.Controllers
                 new Claim(ClaimTypes.Email, user.Email)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JWT:Key").Value ?? ""));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var SecurityToken = new JwtSecurityToken(
                 claims: claims,

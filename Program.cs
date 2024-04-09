@@ -18,7 +18,7 @@ builder.Services.AddSqlServer<AppDBContext>(builder.Configuration.GetConnectionS
 //Service Layer
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options => {
