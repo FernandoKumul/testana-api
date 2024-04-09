@@ -24,6 +24,26 @@ namespace testana_api.Controllers
             return Ok(new Response<IEnumerable<Test>>(true, "Datos obtenidos exitosamente", tests));
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> GetUsers([FromQuery] PaginationParameters parameters)
+        {
+            var pageNumber = parameters.PageNumber;
+            var pageSize = parameters.PageSize;
+            try
+            {
+                (object result, int count) = await _service
+                    .Search(pageNumber, pageSize, parameters.Search);
+
+                return Ok(new Response<object>(true, "Datos obtenidos exitosamente", new {result, count }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new Response<string>(false, $"Error al obtener los datos: {ex.Message}"));
+            }
+
+        }
+
         [HttpGet("questions-answers/{id}")]
         public async Task<IActionResult> GetByIdQuestionsAnswers(int id)
         {
@@ -83,6 +103,7 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
             }
         }
+
         [HttpPut("questions-answers/{id}")]
         public async Task<ActionResult<Response<string>>> Update (int id, [FromBody] TestInUpdateDTO updateTest)
         {

@@ -29,6 +29,29 @@ namespace testana_api.Services
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<(IEnumerable<Test>, int)> Search(int pageNumber, int pageSize, string textSearch)
+        {
+            try
+            {
+                int skip = (pageNumber - 1) * pageSize;
+
+                var pagedData = await _context.Tests
+                    .Where(t => EF.Functions.Like(t.Title, $"%{textSearch}%"))
+                    .OrderBy(x => x.Likes)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToListAsync();
+                var count = _context.Tests.
+                    Count(t => EF.Functions.Like(t.Title, $"%{textSearch}%"));
+
+                return (pagedData, count);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al borrar el test: {ex.Message}", ex.InnerException);
+            }
+        }
+
         public async Task<Test> Create (TestInDTO test)
         {
             var newTest = new Test{
