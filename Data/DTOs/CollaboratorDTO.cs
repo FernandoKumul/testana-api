@@ -9,6 +9,7 @@ namespace ApplicationCore.DTOs.Collaborator
 {
     public class CollaboratorDto
     {
+        public int Id { get; set; }
         public int TestId { get; set; }
 
         public int UserId { get; set; }

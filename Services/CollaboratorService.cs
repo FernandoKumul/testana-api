@@ -15,7 +15,13 @@ namespace testana_api.Services
         {
             _context = context;
         }
-        public async Task<Response<Collaborator>> Create(CollaboratorDto collaborator){
+        public async Task<Response<Collaborator>> Create(CollaboratorDto collaborator)
+        {
+            var repetedCollaborator = await _context.Collaborators.FirstOrDefaultAsync(c => c.TestId == collaborator.TestId && c.UserId == collaborator.UserId);
+            if (repetedCollaborator != null)
+            {
+                return new Response<Collaborator>(false, "El colaborador ya está registrado");
+            }
             try
             {
                 var newCollaborator = new Collaborator
@@ -32,14 +38,15 @@ namespace testana_api.Services
                 throw new Exception($"Error al registrar usuario: {ex.Message}", ex.InnerException);
             }
         }
-        public async Task<Response<Collaborator>> Update(CollaboratorDto collaborator){
+        public async Task<Response<Collaborator>> Update(CollaboratorDto collaborator)
+        {
+            var existingCollaborator = await _context.Collaborators.FindAsync(collaborator.Id);
+            if (existingCollaborator == null)
+            {
+                throw new Exception("Colaborador no encontrado");
+            }
             try
             {
-                var existingCollaborator = await _context.Collaborators.FirstOrDefaultAsync(c => c.TestId == collaborator.TestId && c.UserId == collaborator.UserId);
-                if (existingCollaborator == null)
-                {
-                    throw new Exception("Colaborador no encontrado");
-                }
                 existingCollaborator.TestId = collaborator.TestId;
                 existingCollaborator.UserId = collaborator.UserId;
                 _context.Collaborators.Update(existingCollaborator);
@@ -51,17 +58,18 @@ namespace testana_api.Services
                 throw new Exception($"Error al actualizar colaborador: {ex.Message}", ex.InnerException);
             }
         }
-        public async Task<Response<Collaborator>> Delete(CollaboratorDto collaborator){
+        public async Task<Response<Collaborator>> Delete(int id)
+        {
+            var collaborator = await _context.Collaborators.FindAsync(id);
+            if (collaborator == null)
+            {
+                throw new Exception("Colaborador no encontrado");
+            }
             try
             {
-                var existingCollaborator = await _context.Collaborators.FirstOrDefaultAsync(c => c.TestId == collaborator.TestId && c.UserId == collaborator.UserId);
-                if (existingCollaborator == null)
-                {
-                    throw new Exception("Colaborador no encontrado");
-                }
-                _context.Collaborators.Remove(existingCollaborator);
+                _context.Collaborators.Remove(collaborator);
                 await _context.SaveChangesAsync();
-                return new Response<Collaborator>(true, "Colaborador eliminado exitosamente", existingCollaborator);
+                return new Response<Collaborator>(true, "Colaborador eliminado exitosamente", collaborator);
             }
             catch (Exception ex)
             {

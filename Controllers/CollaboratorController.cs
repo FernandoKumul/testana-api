@@ -37,9 +37,13 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
-        [HttpPut]
-        public async Task<IActionResult> Update(CollaboratorDto collaborator)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, CollaboratorDto collaborator)
         {
+            if (id != collaborator.Id)
+            {
+                return BadRequest(new { message = $"El ID: {id} de la URL no coincide con el ID: {collaborator.Id} del cuerpo de la solicitud." });
+            }
             try
             {
                 var result = await _service.Update(collaborator);
@@ -50,12 +54,12 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
-        [HttpDelete]
-        public async Task<IActionResult> Delete(CollaboratorDto collaborator)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var result = await _service.Delete(collaborator);
+                var result = await _service.Delete(id);
                 return Ok(result);
             }
             catch (Exception ex)
