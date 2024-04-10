@@ -17,7 +17,5 @@ namespace ApplicationCore.DTOs.User
         public string Email { get; set; } = null!;
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,50}$", ErrorMessage = "La contraseña debe tener al menos una mayúscula, una minúscula, un número y un caracter especial.")]
         public string Password { get; set; } = null!;
-
-        public string Avatar { get; set; } = null!;
     }
 }
