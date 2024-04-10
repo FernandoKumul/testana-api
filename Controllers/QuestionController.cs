@@ -29,6 +29,16 @@ namespace testana_api.Controllers
                 return Ok(new Response<object>(true, "Pregunta evaluado exitosamente", new { correct }));
             } catch (Exception ex)
             {
+                if(ex.Message == "Pregunta no encontrado" || ex.Message == "Respuesta no encontrada")
+                {
+                    return NotFound(new Response<string>(false, ex.Message));
+                }
+
+                if (ex.Message == "Respuesta obligatoria para una pregunta abierta")
+                {
+                    return BadRequest(new Response<string>(false, ex.Message));
+                }
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response<string>(false, $"Error al obtener los datos: {ex.Message}", ex.InnerException?.Message ?? ""));
             }
