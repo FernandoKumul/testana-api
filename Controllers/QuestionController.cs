@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlTypes;
 using testana_api.Data.DTOs;
 using testana_api.Services;
 using testana_api.Utilities;

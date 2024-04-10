@@ -39,15 +39,17 @@ namespace testana_api.Services
                 int skip = (pageNumber - 1) * pageSize;
 
                 var pagedData = await _context.Tests
-                    .Where(t => EF.Functions.Like(t.Title, $"%{textSearch}%") ||
-                        EF.Functions.Like(t.Tags, $"%{textSearch}%"))
+                    .Where(t => (EF.Functions.Like(t.Title, $"%{textSearch}%") ||
+                        EF.Functions.Like(t.Tags, $"%{textSearch}%")) &&
+                        (t.Visibility == "public" && t.Status == true))
                     .OrderBy(x => x.Likes)
                     .Skip(skip)
                     .Take(pageSize)
                     .ToListAsync();
                 var count = _context.Tests.
-                    Count(t => EF.Functions.Like(t.Title, $"%{textSearch}%") || 
-                        EF.Functions.Like(t.Tags, $"%{textSearch}%"));
+                    Count(t => (EF.Functions.Like(t.Title, $"%{textSearch}%") || 
+                        EF.Functions.Like(t.Tags, $"%{textSearch}%")) &&
+                        (t.Visibility == "public" && t.Status == true));
 
                 return (pagedData, count);
             }
