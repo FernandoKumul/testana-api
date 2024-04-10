@@ -81,12 +81,21 @@ namespace testana_api.Services
                     throw new Exception("Respuesta no encontrada");
                 }
                 
+                //Pregunta abierta
                 if (question.QuestionTypeId == 1)
                 {
+                    if (otherText is null) throw new Exception("Respuesta obligatoria para una pregunta abierta");
+
                     foreach (var answer in question.Answers)
                     {
-                        var userText = otherText is null ? "" : otherText.ToLower();
-                        if (answer.Text.ToLower() == userText) return true;
+                        if (question.CaseSensitivity == true)
+                        {
+                            if (answer.Text == otherText) return true;
+                        }
+                        else
+                        {
+                            if (answer.Text.ToLower() == otherText.ToLower()) return true;
+                        }
                     }
 
                     return false;
