@@ -11,7 +11,7 @@ public partial class AnswersQuestionsUser
 
     public int UserAnswerId { get; set; }
 
-    public string OtherAnswer { get; set; } = null!;
+    public string? OtherAnswer { get; set; } = null!;
 
     public bool? Correct { get; set; }
 
