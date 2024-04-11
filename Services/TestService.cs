@@ -10,9 +10,12 @@ namespace testana_api.Services
     public class TestService
     {
         private readonly AppDBContext _context;
-        public TestService(AppDBContext context)
+        private readonly QuestionService _questionService;
+
+        public TestService(AppDBContext context, QuestionService questionService)
         {
             _context = context;
+            _questionService = questionService;
         }
 
         public async Task<IEnumerable<Test>> GetAll()
@@ -75,35 +78,8 @@ namespace testana_api.Services
                 await _context.Tests.AddAsync(newTest);
                 await _context.SaveChangesAsync();
 
-                foreach (var question in test.Questions)
-                {
-                    var newQuestion = new Question
-                    {
-                        TestId = newTest.Id,
-                        QuestionTypeId = question.QuestionTypeId,
-                        Description = question.Description,
-                        Image = question.Image,
-                        Order = question.Order,
-                        CaseSensitivity = question.CaseSensitivity,
-                        Points = question.Points,
-                        Duration = question.Duration
-                    };
-                    await _context.Questions.AddAsync(newQuestion);
-                    await _context.SaveChangesAsync();
+                await _questionService.CreateWithAnswers(test.Questions, newTest.Id);
 
-                    foreach (var answer in question.Answers)
-                    {
-                        var newAsnwer = new QuestionAnswer
-                        {
-                            QuestionId = newQuestion.Id,
-                            Text = answer.Text,
-                            Correct = answer.Correct,
-                        };
-                        await _context.QuestionAnswers.AddAsync(newAsnwer);
-                    }
-
-                }
-                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return newTest;
             } catch (Exception ex)

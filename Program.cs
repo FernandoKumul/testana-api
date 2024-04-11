@@ -20,6 +20,7 @@ builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CollaboratorService>();
+builder.Services.AddScoped<QuestionService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options => {
@@ -45,6 +46,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.UseCors(x => x.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
 app.UseAuthorization();
 
