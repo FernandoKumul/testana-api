@@ -18,7 +18,7 @@ namespace testana_api.Controllers{
         {
             _service = service;
         }
-        // Get for all users in the table Users in tha database testana
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -26,7 +26,6 @@ namespace testana_api.Controllers{
             return Ok(new Response<IEnumerable<User>>(true, "Datos obtenidos exitosamente", users));
         }
         
-        // Get by id for a user in the table Users in tha database testana, the id is the primary key in the table, use this for get a specific user
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetbyId(int id)
         {
@@ -38,7 +37,6 @@ namespace testana_api.Controllers{
             return Ok(new Response<User>(true, "Usuario encontrado en la base de datos", user));
         }
 
-        // Post for create a new user in the table Users in tha database testana
         [HttpPost]
         public async Task<IActionResult> Create(UserDto user)
         {
@@ -46,7 +44,6 @@ namespace testana_api.Controllers{
             return Ok(result);
         }
 
-        // Put for update a specific user in the table Users in tha database testana
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UserDto user)
         {
@@ -58,7 +55,6 @@ namespace testana_api.Controllers{
             return Ok(result);
         }
 
-        // Delete for delete a specific user in the table Users in tha database testana
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
