@@ -14,7 +14,7 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public string Avatar { get; set; } = null!;
+    public string? Avatar { get; set; }
     [JsonIgnore]
     public virtual ICollection<Collaborator> Collaborators { get; set; } = new List<Collaborator>();
     [JsonIgnore]
