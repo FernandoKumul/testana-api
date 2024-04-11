@@ -53,5 +53,61 @@ namespace testana_api.Services
                 throw;
             }
         }
+
+        public async Task<bool> CheckQuestion (int questionId , int? answerId, string? otherText)
+        {
+            try
+            {
+                var question = await _context.Questions
+                    .Include(q => q.Answers)
+                    .FirstOrDefaultAsync(q => q.Id == questionId);
+
+                if (question == null)
+                {
+                    throw new Exception("Pregunta no encontrado");
+                }
+
+                //Preguntas opcíón multiple
+                if (question.QuestionTypeId == 2)
+                {
+                    foreach (var answer in question.Answers)
+                    {
+                        if (answer.Id == answerId)
+                        {
+                            return answer.Correct;
+                        }
+                    }
+
+                    throw new Exception("Respuesta no encontrada");
+                }
+                
+                //Pregunta abierta
+                if (question.QuestionTypeId == 1)
+                {
+                    if (otherText is null) throw new Exception("Respuesta obligatoria para una pregunta abierta");
+
+                    foreach (var answer in question.Answers)
+                    {
+                        if (question.CaseSensitivity == true)
+                        {
+                            if (answer.Text == otherText) return true;
+                        }
+                        else
+                        {
+                            if (answer.Text.ToLower() == otherText.ToLower()) return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                throw new Exception("Tipo de pregunta no encontrada");
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+    
     }
 }

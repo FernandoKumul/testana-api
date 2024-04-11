@@ -3,7 +3,6 @@ using testana_api.Data.DTOs;
 using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace testana_api.Controllers
 {

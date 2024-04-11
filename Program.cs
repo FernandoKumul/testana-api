@@ -21,6 +21,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CollaboratorService>();
 builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<UsersAnswerService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options => {
