@@ -48,7 +48,7 @@ namespace testana_api.Services
             var existingEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (existingEmail != null)
             {
-                return new Response<User>(false, "El correo ya está registrado", null);
+                return new Response<User>(false, "El correo ya está registrado");
             }
 
             try
@@ -74,7 +74,7 @@ namespace testana_api.Services
             var existingUser = await GetbyId(user.Id);
             if (existingUser == null)
             {
-                return new Response<User>(false, "Registro no encontrado", null);
+                return new Response<User>(false, "Registro no encontrado");
             }
             
             try
@@ -97,7 +97,7 @@ namespace testana_api.Services
             var user = await GetbyId(id);
             if (user is null)
             {
-                return new Response<User>(false, "Registro no encontrado", null);
+                return new Response<User>(false, "Registro no encontrado");
             }
             try
             {

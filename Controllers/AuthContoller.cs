@@ -39,7 +39,7 @@ namespace testana_api.Controllers
                 }
 
                 string token = GenerateToken(user);
-                return Ok(new Response<object>(true, "Inicio de sesi�n exitoso", new { token }));
+                return Ok(new Response<object>(true, "Inicio de sesión exitoso", new { token }));
             } catch (Exception ex)
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));

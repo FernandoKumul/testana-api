@@ -33,7 +33,7 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
-
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetbyId(int id)
         {
