@@ -82,7 +82,6 @@ namespace testana_api.Services
                 existingUser.Name = user.Name;
                 existingUser.Email = user.Email;
                 existingUser.Password = EncryptString(user.Password);
-                existingUser.Avatar = user.Avatar;
 
                 await _context.SaveChangesAsync();
                 return new Response<User>(true, "Registro Actualizado", existingUser);
