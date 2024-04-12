@@ -1,9 +1,6 @@
-using System;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using testana_api.Data.Models;
 using testana_api.Services;
@@ -38,7 +35,7 @@ namespace testana_api.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest(new Response<User>(false, "Correo o contrase�a incorrectos"));
+                    return BadRequest(new Response<User>(false, "Correo o contraseña incorrectos"));
                 }
 
                 string token = GenerateToken(user);
