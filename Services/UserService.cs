@@ -58,7 +58,6 @@ namespace testana_api.Services
                     Name = user.Name,
                     Email = user.Email,
                     Password = EncryptString(user.Password),
-                    Avatar = ""
                 };
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
@@ -109,7 +108,6 @@ namespace testana_api.Services
                 throw new Exception($"Error al eliminar el registro: {e.Message}");
             }
         }
-
         public static string EncryptString(string str)
         {
             using (SHA256 sha256Hash = SHA256.Create())

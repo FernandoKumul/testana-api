@@ -1,11 +1,4 @@
-using System;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
 using ApplicationCore.DTOs.Collaborator;
