@@ -11,6 +11,7 @@ using testana_api.Utilities;
 using ApplicationCore.DTOs.Login;
 using System.IdentityModel.Tokens.Jwt;
 using ApplicationCore.DTOs.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace testana_api.Controllers
 {
@@ -19,11 +20,13 @@ namespace testana_api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _service;
+        private readonly UserService _userService;
         private IConfiguration config;
 
-        public AuthController(AuthService service, IConfiguration configuration)
+        public AuthController(AuthService service, UserService userService, IConfiguration configuration)
         {
             _service = service;
+            _userService = userService;
             config = configuration;
         }
         [HttpPost("login")]
@@ -33,14 +36,15 @@ namespace testana_api.Controllers
             {
                 var user = await _service.Login(login);
 
-                if(user == null)
+                if (user == null)
                 {
                     return BadRequest(new Response<User>(false, "Correo o contrase�a incorrectos"));
                 }
 
                 string token = GenerateToken(user);
                 return Ok(new Response<object>(true, "Inicio de sesión exitoso", new { token }));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
@@ -76,6 +80,31 @@ namespace testana_api.Controllers
 
             string token = new JwtSecurityTokenHandler().WriteToken(SecurityToken);
             return token;
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<User>> Get()
+        {
+            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (id == null)
+            {
+                return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+            }
+            try
+            {
+                var userId = int.Parse(id);
+                var user = await _userService.GetbyId(userId);
+                if (user == null)
+                {
+                    return NotFound(new { message = $"No se encontró el registro con el ID: {userId}" });
+                }
+                return Ok(new Response<User>(true, "Usuario autenticado", user));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
+            }
         }
     }
 }
