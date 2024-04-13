@@ -26,6 +26,8 @@ public partial class Question
 
     public virtual ICollection<QuestionAnswer> Answers { get; set; } = new List<QuestionAnswer>();
 
+    public virtual ICollection<AnswersQuestionsUser> UserAnswers { get; set; } = new List<AnswersQuestionsUser>();
+
     public virtual QuestionType QuestionType { get; set; } = null!;
 
     [JsonIgnore]
