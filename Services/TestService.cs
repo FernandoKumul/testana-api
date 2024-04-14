@@ -25,12 +25,12 @@ namespace testana_api.Services
             return await _context.Tests.ToListAsync();
         }
 
-        public async Task<Test?> GetByIdQuestionsAnswers(int testId)
+        public async Task<Test?> GetByIdQuestionsAnswers(int testId, int userId)
         {
             return await _context.Tests
                 .Include(t => t.Questions)
                     .ThenInclude(q => q.Answers)
-                .Where(t => t.Id == testId)
+                .Where(t => t.Id == testId && t.UserId == userId)
                 .FirstOrDefaultAsync();
         }
 
@@ -168,14 +168,14 @@ namespace testana_api.Services
             }
         }
 
-        public async Task<bool> UpdateQuestionsAnswers(TestInUpdateDTO updatedTest, int idTest)
+        public async Task<bool> UpdateQuestionsAnswers(TestInUpdateDTO updatedTest, int idTest, int userId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 var idQuestionAdds = new List<int>();
-                var existingTest = await GetByIdQuestionsAnswers(idTest);
+                var existingTest = await GetByIdQuestionsAnswers(idTest, userId);
 
                 if (existingTest is null)
                 {

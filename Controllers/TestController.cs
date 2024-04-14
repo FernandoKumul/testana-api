@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using testana_api.Data.DTOs;
 using testana_api.Data.Models;
@@ -44,12 +45,21 @@ namespace testana_api.Controllers
 
         }
 
+        [Authorize]
         [HttpGet("questions-answers/{id}")]
         public async Task<IActionResult> GetByIdQuestionsAnswers(int id)
         {
+            var payloadId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             try
             {
-                var test = await _service.GetByIdQuestionsAnswers(id);
+                if (payloadId == null)
+                {
+                    return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+                }
+
+                var userId = int.Parse(payloadId);
+                var test = await _service.GetByIdQuestionsAnswers(id, userId);
                 if(test is null) 
                 {
                     return NotFound(new Response<string>(false, $"Test no encontrado con el id {id}"));
@@ -118,12 +128,26 @@ namespace testana_api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Response<Test>>> Create([FromBody] TestInDTO test)
         {
+            var payloadId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             try
             {
-                //Validar si el id del usuario existe -> Luego
+                if (payloadId == null)
+                {
+                    return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+                }
+
+                var userId = int.Parse(payloadId);
+
+                if (userId != test.UserId)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        new Response<string>(false, "El userId no coincide con su sesión"));
+                }
 
                 for (int i = 0; i < test.Questions.Count; i++)
                 {
@@ -160,9 +184,11 @@ namespace testana_api.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("questions-answers/{id}")]
         public async Task<ActionResult<Response<string>>> Update (int id, [FromBody] TestInUpdateDTO updateTest)
         {
+
             for (int i = 0; i < updateTest.Questions.Count; i++)
             {
                 int nCorrect = 0;
@@ -190,10 +216,18 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<int>(false, "No está ingresando algún color valido"));
             }
 
+            var payloadId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             try
             {
-                //Comprobar que es mi test
-                var result = await _service.UpdateQuestionsAnswers(updateTest, id);
+                if (payloadId == null)
+                {
+                    return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+                }
+
+                var userId = int.Parse(payloadId);
+
+                var result = await _service.UpdateQuestionsAnswers(updateTest, id, userId);
 
                 if (!result)
                 {
