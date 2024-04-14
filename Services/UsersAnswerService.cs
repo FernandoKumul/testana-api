@@ -17,7 +17,10 @@ namespace testana_api.Services
         {
             try
             {
-                var testFind = await _context.Tests.FindAsync(userAnswer.TestId) ??
+                var testFind = await _context.Tests
+                    .Include(t => t.Collaborators)
+                    .Where(t => userAnswer.TestId == t.Id)
+                    .SingleOrDefaultAsync() ??
                     throw new Exception("Test no encontrado");
 
                 if(!testFind.Status)
@@ -25,7 +28,13 @@ namespace testana_api.Services
                     throw new Exception("Test no encontrado");
                 }
 
-                //Verificar la visibilidad privada
+                if(testFind.Visibility == "private")
+                {
+                    if(!testFind.Collaborators.Any(t => t.UserId == userAnswer.UserId))
+                    {
+                        throw new Exception("Test no encontrado");
+                    }
+                }
 
                 //Verificar que el si se puede responser por respuesta o por completado todo 
 
