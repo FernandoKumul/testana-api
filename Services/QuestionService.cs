@@ -66,6 +66,11 @@ namespace testana_api.Services
                 var UserAnswer = await _context.UsersAnswers.FindAsync(check.UserAnswerId) ??
                     throw new Exception("Respuesta de usuario no encontrada");
 
+                if(UserAnswer.CompletionDate != null)
+                {
+                    throw new Exception("Ya has completado este test por completo");
+                }
+
                 if (UserAnswer.UserId != userId)
                 {
                     throw new Exception("No tienes acceso a la respuesta de usuario que estás proporcionando");

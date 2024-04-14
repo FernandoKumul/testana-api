@@ -51,7 +51,7 @@ namespace testana_api.Controllers
                     return BadRequest(new Response<string>(false, ex.Message));
                 }
 
-                if (ex.Message == "Solo puedes responder una vez cada pregunta")
+                if (ex.Message == "Solo puedes responder una vez cada pregunta" || ex.Message == "Ya has completado este test por completo")
                 {
                     return Conflict(new Response<string>(false, ex.Message));
                 }
