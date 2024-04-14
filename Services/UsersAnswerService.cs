@@ -69,5 +69,21 @@ namespace testana_api.Services
                 throw;
             }
         }
+
+        public async Task Complete(int id)
+        {
+            try
+            {
+                var userAnswer = await _context.UsersAnswers.FindAsync(id)
+                    ?? throw new Exception("Respuesta de Usuario no encontrado");
+
+                userAnswer.CompletionDate = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
