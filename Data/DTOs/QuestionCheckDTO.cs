@@ -9,5 +9,7 @@ namespace testana_api.Data.DTOs
         public int QuestionId { get; set; }
 
         public string? OtherAnswer { get; set; }
+
+        public int UserAnswerId { get; set; }
     }
 }

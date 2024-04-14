@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 using testana_api.Data;
 using testana_api.Data.DTOs;
 using testana_api.Data.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace testana_api.Services
 {
@@ -23,13 +25,138 @@ namespace testana_api.Services
             return await _context.Tests.ToListAsync();
         }
 
-        public async Task<Test?> GetByIdQuestionsAnswers(int testId)
+        public async Task<Test?> GetByIdQuestionsAnswers(int testId, int userId)
         {
             return await _context.Tests
                 .Include(t => t.Questions)
                     .ThenInclude(q => q.Answers)
-                .Where(t => t.Id == testId)
+                .Where(t => t.Id == testId && t.UserId == userId)
                 .FirstOrDefaultAsync();
+        }
+        
+        public async Task<IEnumerable<TestMinOutDTO>> GetDoneByUserId(int userId)
+        {
+            return await _context.UsersAnswers
+                .Include(ua => ua.Test)
+                    .ThenInclude(t => t.User)
+                .Where(ua => ua.UserId == userId && ua.CompletionDate != null)
+                .Select(ua => new TestMinOutDTO
+                {
+                    Id = ua.Test.Id,
+                    AuthorId = ua.Test.User.Id,
+                    AuthorName = ua.Test.User.Name,
+                    UsersAnswerId = ua.Id,
+                    Title = ua.Test.Title,
+                    Color = ua.Test.Visibility,
+                    Visibility = ua.Test.Visibility,
+                    Image = ua.Test.Image,
+                    Status = ua.Test.Status,
+                    CompletionDate = ua.CompletionDate,
+                    CreatedDate = ua.Test.CreatedDate
+                })
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<TestMinOutDTO>> GetCreatedByUserId(int userId)
+        {
+            return await _context.Tests
+                .Where(t => t.UserId == userId)
+                .Select(t => new TestMinOutDTO
+                {
+                    Id = t.Id,
+                    AuthorName = t.User.Name,
+                    AuthorId = t.User.Id,
+                    Title = t.Title,
+                    Color = t.Visibility,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Status = t.Status,
+                    CreatedDate = t.CreatedDate
+                })
+                .ToListAsync();
+        }
+
+        public async Task<TestPreviewOutDTO?> GetPreviewById(int testId, int? userId)
+        {
+            return await _context.Tests
+                .Include(t => t.User)
+                .Where(t => t.Id == testId && t.Status == true && 
+                    (t.Visibility != "private" || t.Collaborators.Any(c => c.UserId == userId)))
+                .Select(t => new TestPreviewOutDTO
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Color = t.Color,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Random = t.Random,
+                    Duration = t.Duration,
+                    CreatedDate = t.CreatedDate,
+                    Likes = t.Likes,
+                    EvaluateByQuestion = t.EvaluateByQuestion,
+                    Dislikes = t.Dislikes,
+                    User = new UserOutDTO
+                    {
+                        Id = t.User.Id,
+                        Email = t.User.Email,
+                        Name = t.User.Name
+                    }
+                })
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<TestReplyOutDTO?> GetReplyOneById(int testId, int? userId)
+        {
+
+            var test = await _context.Tests
+                .Include(t => t.Questions)
+                    .ThenInclude(q => q.Answers)
+                .Where(t => t.Id == testId && t.Status == true &&
+                    (t.Visibility != "private" || t.Collaborators.Any(c => c.UserId == userId)))
+                .Select(t => new TestReplyOutDTO
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Color = t.Color,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Random = t.Random,
+                    Duration = t.Duration,
+                    CreatedDate = t.CreatedDate,
+                    Likes = t.Likes,
+                    EvaluateByQuestion = t.EvaluateByQuestion,
+                    Dislikes = t.Dislikes,
+                    Questions = t.Questions.Select(question => new QuestionReplyDTO
+                    {
+                        Id = question.Id,
+                        TestId = question.TestId,
+                        QuestionTypeId = question.QuestionTypeId,
+                        Description = question.Description,
+                        Image = question.Image,
+                        Order = question.Order,
+                        CaseSensitivity = question.CaseSensitivity,
+                        Points = question.Points,
+                        Duration = question.Duration,
+                        Answers = question.Answers.Select(answer => new QuestionAnswerWithoutCorrectDTO
+                        {
+                            Id = answer.Id,
+                            QuestionId = answer.Id,
+                            Text = question.QuestionTypeId == 1 ? null : answer.Text,
+                        }).ToList()
+                    })
+                    .OrderBy(q => q.Order)
+                    .ToList(),
+                })
+                .SingleOrDefaultAsync();
+
+            if (test != null && test.Random)
+            {
+                var random = new Random();
+                test.Questions = test.Questions.OrderBy(q => random.Next()).ToList();
+            }
+
+            return test;
         }
 
         public async Task<(IEnumerable<Test>, int)> Search(int pageNumber, int pageSize, string textSearch)
@@ -93,14 +220,14 @@ namespace testana_api.Services
             }
         }
 
-        public async Task<bool> UpdateQuestionsAnswers(TestInUpdateDTO updatedTest, int idTest)
+        public async Task<bool> UpdateQuestionsAnswers(TestInUpdateDTO updatedTest, int idTest, int userId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 var idQuestionAdds = new List<int>();
-                var existingTest = await GetByIdQuestionsAnswers(idTest);
+                var existingTest = await GetByIdQuestionsAnswers(idTest, userId);
 
                 if (existingTest is null)
                 {
