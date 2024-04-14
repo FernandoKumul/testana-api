@@ -90,6 +90,34 @@ namespace testana_api.Controllers
             }
         }
 
+        [HttpGet("reply-one/{id}")]
+        public async Task<IActionResult> GetReplyOneById(int id)
+        {
+            try
+            {
+                var idPayload = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int? userId = null;
+
+                if (idPayload != null)
+                {
+                    userId = int.Parse(idPayload);
+                }
+
+                var test = await _service.GetReplyOneById(id, userId);
+                if (test is null)
+                {
+                    return NotFound(new Response<string>(false, $"Test no encontrado con el id: {id}"));
+                }
+
+                return Ok(new Response<TestReplyOutDTO>(true, "Test obtenido exitosamente", test));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    new Response<string>(false, $"Error al obtener los datos: {ex.Message}", ex.InnerException?.Message ?? ""));
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<Response<Test>>> Create([FromBody] TestInDTO test)
         {

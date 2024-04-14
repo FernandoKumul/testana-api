@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 using testana_api.Data;
 using testana_api.Data.DTOs;
 using testana_api.Data.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace testana_api.Services
 {
@@ -58,6 +60,49 @@ namespace testana_api.Services
                         Email = t.User.Email,
                         Name = t.User.Name
                     }
+                })
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<TestReplyOutDTO?> GetReplyOneById(int testId, int? userId)
+        {
+            return await _context.Tests
+                .Include(t => t.Questions)
+                    .ThenInclude(q => q.Answers)
+                .Where(t => t.Id == testId && t.Status == true &&
+                    (t.Visibility != "private" || t.Collaborators.Any(c => c.UserId == userId)))
+                .Select(t => new TestReplyOutDTO
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Color = t.Color,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Random = t.Random,
+                    Duration = t.Duration,
+                    CreatedDate = t.CreatedDate,
+                    Likes = t.Likes,
+                    EvaluateByQuestion = t.EvaluateByQuestion,
+                    Dislikes = t.Dislikes,
+                    Questions = t.Questions.Select(question => new QuestionReplyDTO
+                    {
+                        Id = question.Id,
+                        TestId = question.TestId,
+                        QuestionTypeId = question.QuestionTypeId,
+                        Description = question.Description,
+                        Image = question.Image,
+                        Order = question.Order,
+                        CaseSensitivity = question.CaseSensitivity,
+                        Points = question.Points,
+                        Duration = question.Duration,
+                        Answers = question.Answers.Select(answer => new QuestionAnswerWithoutCorrectDTO
+                        {
+                            Id = answer.Id,
+                            QuestionId = answer.Id,
+                            Text = answer.Text,
+                        }).ToList()
+                    }).ToList(),
                 })
                 .SingleOrDefaultAsync();
         }
