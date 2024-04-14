@@ -64,7 +64,7 @@ namespace testana_api.Services
 
                 if (question == null)
                 {
-                    throw new Exception("Pregunta no encontrado");
+                    throw new Exception("Pregunta no encontrada");
                 }
 
                 //Preguntas opcíón multiple
@@ -74,6 +74,7 @@ namespace testana_api.Services
                     {
                         if (answer.Id == answerId)
                         {
+                            //Registrar en DB
                             return answer.Correct;
                         }
                     }
@@ -97,7 +98,7 @@ namespace testana_api.Services
                             if (answer.Text.ToLower() == otherText.ToLower()) return true;
                         }
                     }
-
+                    //Registrar en DB
                     return false;
                 }
 

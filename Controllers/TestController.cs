@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using testana_api.Data.DTOs;
 using testana_api.Data.Models;
 using testana_api.Services;
@@ -58,6 +59,34 @@ namespace testana_api.Controllers
             } catch (Exception ex)
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
+            }
+        }
+
+        [HttpGet("preview/{id}")]
+        public async Task<IActionResult> GetPreviewById(int id)
+        {
+            try
+            {
+                var idPayload = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int? userId = null;
+
+                if(idPayload != null)
+                {
+                    userId = int.Parse(idPayload);
+                }
+
+                var test = await _service.GetPreviewById(id, userId);
+                if (test is null)
+                {
+                    return NotFound(new Response<string>(false, $"Test no encontrado con el id: {id}"));
+                }
+
+                return Ok(new Response<TestPreviewOutDTO>(true, "Test obtenido exitosamente", test));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                    new Response<string>(false, $"Error al obtener los datos: {ex.Message}", ex.InnerException?.Message ?? ""));
             }
         }
 

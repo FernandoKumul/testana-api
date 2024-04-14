@@ -32,6 +32,36 @@ namespace testana_api.Services
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<TestPreviewOutDTO?> GetPreviewById(int testId, int? userId)
+        {
+            return await _context.Tests
+                .Include(t => t.User)
+                .Where(t => t.Id == testId && t.Status == true && 
+                    (t.Visibility != "private" || t.Collaborators.Any(c => c.UserId == userId)))
+                .Select(t => new TestPreviewOutDTO
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    Color = t.Color,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Random = t.Random,
+                    Duration = t.Duration,
+                    CreatedDate = t.CreatedDate,
+                    Likes = t.Likes,
+                    EvaluateByQuestion = t.EvaluateByQuestion,
+                    Dislikes = t.Dislikes,
+                    User = new UserOutDTO
+                    {
+                        Id = t.User.Id,
+                        Email = t.User.Email,
+                        Name = t.User.Name
+                    }
+                })
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<(IEnumerable<Test>, int)> Search(int pageNumber, int pageSize, string textSearch)
         {
             try
