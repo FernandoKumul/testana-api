@@ -70,6 +70,51 @@ namespace testana_api.Controllers
             {
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
             }
+        }       
+        [Authorize]
+        [HttpGet("done")]
+        public async Task<IActionResult> GetDoneByUserId()
+        {
+            var payloadId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            try
+            {
+                if (payloadId == null)
+                {
+                    return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+                }
+
+                var userId = int.Parse(payloadId);
+                var test = await _service.GetDoneByUserId(userId);
+
+                return Ok(new Response<IEnumerable<TestMinOutDTO>>(true, "Datos obtenidos exitosamente", test));
+            } catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
+            }
+        }
+        
+        [Authorize]
+        [HttpGet("created")]
+        public async Task<IActionResult> GetCreatedByUserId()
+        {
+            var payloadId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            try
+            {
+                if (payloadId == null)
+                {
+                    return BadRequest(new Response<string>(false, "Usuario no autenticado"));
+                }
+
+                var userId = int.Parse(payloadId);
+                var test = await _service.GetCreatedByUserId(userId);
+
+                return Ok(new Response<IEnumerable<TestMinOutDTO>>(true, "Datos obtenidos exitosamente", test));
+            } catch (Exception ex)
+            {
+                return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? "")); //Cambiar por un 500 luego :D
+            }
         }
 
         [HttpGet("preview/{id}")]

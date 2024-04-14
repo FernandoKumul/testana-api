@@ -33,6 +33,47 @@ namespace testana_api.Services
                 .Where(t => t.Id == testId && t.UserId == userId)
                 .FirstOrDefaultAsync();
         }
+        
+        public async Task<IEnumerable<TestMinOutDTO>> GetDoneByUserId(int userId)
+        {
+            return await _context.UsersAnswers
+                .Include(ua => ua.Test)
+                    .ThenInclude(t => t.User)
+                .Where(ua => ua.UserId == userId && ua.CompletionDate != null)
+                .Select(ua => new TestMinOutDTO
+                {
+                    Id = ua.Test.Id,
+                    AuthorId = ua.Test.User.Id,
+                    AuthorName = ua.Test.User.Name,
+                    UsersAnswerId = ua.Id,
+                    Title = ua.Test.Title,
+                    Color = ua.Test.Visibility,
+                    Visibility = ua.Test.Visibility,
+                    Image = ua.Test.Image,
+                    Status = ua.Test.Status,
+                    CompletionDate = ua.CompletionDate,
+                    CreatedDate = ua.Test.CreatedDate
+                })
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<TestMinOutDTO>> GetCreatedByUserId(int userId)
+        {
+            return await _context.Tests
+                .Where(t => t.UserId == userId)
+                .Select(t => new TestMinOutDTO
+                {
+                    Id = t.Id,
+                    AuthorName = t.User.Name,
+                    AuthorId = t.User.Id,
+                    Title = t.Title,
+                    Color = t.Visibility,
+                    Visibility = t.Visibility,
+                    Image = t.Image,
+                    Status = t.Status,
+                    CreatedDate = t.CreatedDate
+                })
+                .ToListAsync();
+        }
 
         public async Task<TestPreviewOutDTO?> GetPreviewById(int testId, int? userId)
         {
