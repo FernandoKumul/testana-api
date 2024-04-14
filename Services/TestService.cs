@@ -100,7 +100,7 @@ namespace testana_api.Services
                         {
                             Id = answer.Id,
                             QuestionId = answer.Id,
-                            Text = answer.Text,
+                            Text = question.QuestionTypeId == 1 ? null : answer.Text,
                         }).ToList()
                     }).ToList(),
                 })

@@ -6,7 +6,7 @@
 
         public int QuestionId { get; set; }
 
-        public string Text { get; set; } = null!;
+        public string? Text { get; set; }
 
     }
 }
