@@ -107,7 +107,8 @@ namespace testana_api.Services
 
         public async Task<TestReplyOutDTO?> GetReplyOneById(int testId, int? userId)
         {
-            return await _context.Tests
+
+            var test = await _context.Tests
                 .Include(t => t.Questions)
                     .ThenInclude(q => q.Answers)
                 .Where(t => t.Id == testId && t.Status == true &&
@@ -143,9 +144,19 @@ namespace testana_api.Services
                             QuestionId = answer.Id,
                             Text = question.QuestionTypeId == 1 ? null : answer.Text,
                         }).ToList()
-                    }).ToList(),
+                    })
+                    .OrderBy(q => q.Order)
+                    .ToList(),
                 })
                 .SingleOrDefaultAsync();
+
+            if (test != null && test.Random)
+            {
+                var random = new Random();
+                test.Questions = test.Questions.OrderBy(q => random.Next()).ToList();
+            }
+
+            return test;
         }
 
         public async Task<(IEnumerable<Test>, int)> Search(int pageNumber, int pageSize, string textSearch)
