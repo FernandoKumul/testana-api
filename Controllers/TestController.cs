@@ -188,12 +188,6 @@ namespace testana_api.Controllers
 
                 var userId = int.Parse(payloadId);
 
-                if (userId != test.UserId)
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden,
-                        new Response<string>(false, "El userId no coincide con su sesión"));
-                }
-
                 for (int i = 0; i < test.Questions.Count; i++)
                 {
                     int nCorrect = 0;
@@ -221,6 +215,7 @@ namespace testana_api.Controllers
                 }
 
                 //Agregar en la función
+                test.UserId = userId;
                 var newTest = await _service.Create(test);
                 return Created("created test", new Response<Test>(true, "Test creado con exito", newTest));
             } catch (Exception ex)

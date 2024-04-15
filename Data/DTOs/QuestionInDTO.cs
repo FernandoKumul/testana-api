@@ -18,7 +18,6 @@ namespace testana_api.Data.DTOs
 
         public bool? CaseSensitivity { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Los puntos de la es obligatorio.")]
         public int Points { get; set; }
 
         public int? Duration { get; set; }
