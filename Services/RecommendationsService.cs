@@ -3,6 +3,7 @@ using ApplicationCore.DTOs.Recommendation;
 using ApplicationCore.DTOs.RecommendationToUpdate;
 using testana_api.Data.Models;
 using testana_api.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace testana_api.Services
 {

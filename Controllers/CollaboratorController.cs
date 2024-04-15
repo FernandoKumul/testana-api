@@ -68,12 +68,17 @@ namespace testana_api.Controllers
             }
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<Response<string>>> Delete (int id)
         {
             try
             {
                 var result = await _service.Delete(id);
-                return Ok(result);
+                if (!result)
+                {
+                    return NotFound(new Response<string>(false, $"El Colaborador con el id {id} no existe"));
+                }
+
+                return Ok(new Response<string>(true, "Colaborador borrado de manera exitosa"));
             }
             catch (Exception ex)
             {

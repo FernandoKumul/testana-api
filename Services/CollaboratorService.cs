@@ -67,21 +67,32 @@ namespace testana_api.Services
                 throw new Exception($"Error al actualizar colaborador: {ex.Message}", ex.InnerException);
             }
         }
-        public async Task<Response<Collaborator>> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var collaborator = await _context.Collaborators.FindAsync(id);
-            if (collaborator == null)
-            {
-                throw new Exception("Colaborador no encontrado");
-            }
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Collaborators.Remove(collaborator);
-                await _context.SaveChangesAsync();
-                return new Response<Collaborator>(true, "Colaborador eliminado exitosamente", collaborator);
+                var recommendationsToDelete = await _context.Recommendations
+                    .Where(a => a.Question.TestId == id)
+                    .ToListAsync();
+                _context.Recommendations.RemoveRange(recommendationsToDelete);
+                var collaborator = await GetById(id);
+                if (collaborator != null)
+                {
+                    _context.Collaborators.Remove(collaborator);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 throw new Exception($"Error al eliminar colaborador: {ex.Message}", ex.InnerException);
             }
         }
