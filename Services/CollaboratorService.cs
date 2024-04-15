@@ -72,9 +72,7 @@ namespace testana_api.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var recommendationsToDelete = await _context.Recommendations
-                    .Where(a => a.Question.TestId == id)
-                    .ToListAsync();
+                var recommendationsToDelete = await _context.Recommendations.Where(r => r.CollaboratorId == id).ToListAsync();
                 _context.Recommendations.RemoveRange(recommendationsToDelete);
                 var collaborator = await GetById(id);
                 if (collaborator != null)

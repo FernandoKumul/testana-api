@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace testana_api.Data.Models;
+﻿namespace testana_api.Data.Models;
 
 public partial class Recommendation
 {
