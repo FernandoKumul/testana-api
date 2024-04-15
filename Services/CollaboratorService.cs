@@ -1,6 +1,4 @@
 using ApplicationCore.DTOs.Collaborator;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using testana_api.Data;
 using testana_api.Data.Models;
@@ -14,6 +12,17 @@ namespace testana_api.Services
         public CollaboratorService(AppDBContext context)
         {
             _context = context;
+        }
+        public async Task<Collaborator?> GetById(int id)
+        {
+            try
+            {
+                return await _context.Collaborators.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener colaborador: {ex.Message}", ex.InnerException);
+            }
         }
         public async Task<Response<Collaborator>> Create(CollaboratorDto collaborator)
         {
@@ -40,10 +49,10 @@ namespace testana_api.Services
         }
         public async Task<Response<Collaborator>> Update(CollaboratorDto collaborator)
         {
-            var existingCollaborator = await _context.Collaborators.FindAsync(collaborator.Id);
+            var existingCollaborator = await GetById(collaborator.Id);
             if (existingCollaborator == null)
             {
-                throw new Exception("Colaborador no encontrado");
+                return new Response<Collaborator>(false, "Colaborador no encontrado");
             }
             try
             {
@@ -58,21 +67,30 @@ namespace testana_api.Services
                 throw new Exception($"Error al actualizar colaborador: {ex.Message}", ex.InnerException);
             }
         }
-        public async Task<Response<Collaborator>> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var collaborator = await _context.Collaborators.FindAsync(id);
-            if (collaborator == null)
-            {
-                throw new Exception("Colaborador no encontrado");
-            }
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Collaborators.Remove(collaborator);
-                await _context.SaveChangesAsync();
-                return new Response<Collaborator>(true, "Colaborador eliminado exitosamente", collaborator);
+                var recommendationsToDelete = await _context.Recommendations.Where(r => r.CollaboratorId == id).ToListAsync();
+                _context.Recommendations.RemoveRange(recommendationsToDelete);
+                var collaborator = await GetById(id);
+                if (collaborator != null)
+                {
+                    _context.Collaborators.Remove(collaborator);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 throw new Exception($"Error al eliminar colaborador: {ex.Message}", ex.InnerException);
             }
         }

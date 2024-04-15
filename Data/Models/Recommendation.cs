@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace testana_api.Data.Models;
+﻿namespace testana_api.Data.Models;
 
 public partial class Recommendation
 {
@@ -16,4 +13,5 @@ public partial class Recommendation
     public DateTime CreatedDate { get; set; }
 
     public virtual Collaborator Collaborator { get; set; } = null!;
+    public virtual Question Question { get; set; } = null!;
 }

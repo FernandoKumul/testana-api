@@ -1,14 +1,10 @@
 using ApplicationCore.DTOs.User;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using testana_api.Data;
 using testana_api.Data.Models;
 using testana_api.Utilities;
 using System.Security.Cryptography;
 using System.Text;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace testana_api.Services
 {

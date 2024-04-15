@@ -144,6 +144,7 @@ public partial class AppDBContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CollaboratorId).HasColumnName("collaboratorId");
+            entity.Property(e => e.QuestionId).HasColumnName("questionId");
             entity.Property(e => e.CreatedDate)
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
@@ -151,12 +152,16 @@ public partial class AppDBContext : DbContext
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("note");
-            entity.Property(e => e.QuestionId).HasColumnName("questionId");
 
             entity.HasOne(d => d.Collaborator).WithMany(p => p.Recommendations)
                 .HasForeignKey(d => d.CollaboratorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Recommendations.collaboratorId");
+            
+            entity.HasOne(d => d.Question).WithMany(p => p.Recommendations)
+                .HasForeignKey(d => d.QuestionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Recommendations.questionId");
         });
 
         modelBuilder.Entity<Test>(entity =>

@@ -1,35 +1,36 @@
+using Microsoft.AspNetCore.Authorization;
+using ApplicationCore.DTOs.Recommendation;
+using ApplicationCore.DTOs.RecommendationToUpdate;
 using Microsoft.AspNetCore.Mvc;
+using testana_api.Data.Models;
 using testana_api.Services;
 using testana_api.Utilities;
-using ApplicationCore.DTOs.Collaborator;
-using Microsoft.AspNetCore.Authorization;
-using testana_api.Data.Models;
 
 namespace testana_api.Controllers
 {
     [Authorize]
-    [ApiController]
     [Route("api/[controller]")]
-    public class CollaboratorController : ControllerBase
+    [ApiController]
+    public class RecommendationController : ControllerBase
     {
-        private readonly CollaboratorService _service;
+        private readonly RecommendationService _service;
 
-        public CollaboratorController(CollaboratorService service)
+        public RecommendationController(RecommendationService service)
         {
             _service = service;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Collaborator>> GetbyId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _service.GetById(id);
                 if (result == null)
                 {
-                    return NotFound(new Response<string>(false, $"No se encontró el colaborador con el ID: {id}"));
+                    return NotFound(new Response<string>(false, $"No se encontró la recomendación con el ID: {id}"));
                 }
-                return Ok(new Response<Collaborator>(true, "Colaborador obtenido exitosamente", result));
+                return Ok(new Response<Recommendation>(true, "Recomendación obtenida exitosamente", result));
             }
             catch (Exception ex)
             {
@@ -38,11 +39,11 @@ namespace testana_api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CollaboratorDto collaborator)
+        public async Task<IActionResult> Create(RecommendationDto recommendation)
         {
             try
             {
-                var result = await _service.Create(collaborator);
+                var result = await _service.Create(recommendation);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -50,16 +51,17 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, CollaboratorDto collaborator)
+        public async Task<IActionResult> Update(int id, RecommendationToUpdateDto recommendation)
         {
-            if (id != collaborator.Id)
+            if (id != recommendation.Id)
             {
-                return BadRequest(new { message = $"El ID: {id} de la URL no coincide con el ID: {collaborator.Id} del cuerpo de la solicitud." });
+                return BadRequest(new { message = $"El ID: {id} de la URL no coincide con el ID: {recommendation.Id} del cuerpo de la solicitud." });
             }
             try
             {
-                var result = await _service.Update(collaborator);
+                var result = await _service.Update(id, recommendation);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -67,18 +69,14 @@ namespace testana_api.Controllers
                 return BadRequest(new Response<string>(false, ex.Message, ex.InnerException?.Message ?? ""));
             }
         }
+
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Response<string>>> Delete (int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var result = await _service.Delete(id);
-                if (!result)
-                {
-                    return NotFound(new Response<string>(false, $"El Colaborador con el id {id} no existe"));
-                }
-
-                return Ok(new Response<string>(true, "Colaborador borrado de manera exitosa"));
+                return Ok(result);
             }
             catch (Exception ex)
             {
