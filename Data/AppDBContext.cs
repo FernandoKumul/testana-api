@@ -41,18 +41,17 @@ public partial class AppDBContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__AnswersQ__3213E83F79199C2A");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Correct).HasColumnName("correct");
-            entity.Property(e => e.OtherAnswer)
+            entity.Property(e => e.Text)
                 .HasMaxLength(100)
                 .IsUnicode(false)
-                .HasColumnName("otherAnswer");
-            entity.Property(e => e.QuestionAnswerId).HasColumnName("questionAnswerId");
+                .HasColumnName("text");
+            entity.Property(e => e.QuestionId).HasColumnName("questionId");
             entity.Property(e => e.UserAnswerId).HasColumnName("userAnswerId");
 
-            entity.HasOne(d => d.QuestionAnswer).WithMany(p => p.AnswersQuestionsUsers)
-                .HasForeignKey(d => d.QuestionAnswerId)
+            entity.HasOne(d => d.Question).WithMany(p => p.UserAnswers)
+                .HasForeignKey(d => d.QuestionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_AnswersQuestionsUsers.questionAnswerId");
+                .HasConstraintName("FK__AnswersQu__quest__6E01572D");
 
             entity.HasOne(d => d.UserAnswer).WithMany(p => p.AnswersQuestionsUsers)
                 .HasForeignKey(d => d.UserAnswerId)

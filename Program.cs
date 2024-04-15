@@ -23,6 +23,7 @@ builder.Services.AddScoped<CollaboratorService>();
 builder.Services.AddScoped<QuestionService>();
 builder.Services.AddScoped<UsersAnswerService>();
 builder.Services.AddScoped<RecommendationService>();
+builder.Services.AddScoped<AnswerQuestionUserService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options => {
