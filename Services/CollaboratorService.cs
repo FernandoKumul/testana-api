@@ -1,6 +1,4 @@
 using ApplicationCore.DTOs.Collaborator;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using testana_api.Data;
 using testana_api.Data.Models;
@@ -14,6 +12,17 @@ namespace testana_api.Services
         public CollaboratorService(AppDBContext context)
         {
             _context = context;
+        }
+        public async Task<Collaborator?> GetById(int id)
+        {
+            try
+            {
+                return await _context.Collaborators.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener colaborador: {ex.Message}", ex.InnerException);
+            }
         }
         public async Task<Response<Collaborator>> Create(CollaboratorDto collaborator)
         {
@@ -40,10 +49,10 @@ namespace testana_api.Services
         }
         public async Task<Response<Collaborator>> Update(CollaboratorDto collaborator)
         {
-            var existingCollaborator = await _context.Collaborators.FindAsync(collaborator.Id);
+            var existingCollaborator = await GetById(collaborator.Id);
             if (existingCollaborator == null)
             {
-                throw new Exception("Colaborador no encontrado");
+                return new Response<Collaborator>(false, "Colaborador no encontrado");
             }
             try
             {

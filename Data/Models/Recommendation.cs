@@ -16,4 +16,5 @@ public partial class Recommendation
     public DateTime CreatedDate { get; set; }
 
     public virtual Collaborator Collaborator { get; set; } = null!;
+    public virtual Question Question { get; set; } = null!;
 }
