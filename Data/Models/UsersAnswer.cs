@@ -22,5 +22,5 @@ public partial class UsersAnswer
     public virtual Test Test { get; set; } = null!;
 
     [JsonIgnore]
-    public virtual User User { get; set; } = null!;
+    public virtual User? User { get; set; } = null!;
 }
