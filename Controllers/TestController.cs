@@ -237,7 +237,7 @@ namespace testana_api.Controllers
                     if (answer.Correct) nCorrect++;
                 }
 
-                if (nCorrect != 1)
+                if (nCorrect == 0)
                 {
                     return BadRequest(new Response<string>(false, $"La pregunta[{i}] no tiene ninguna respuesta correcta"));
                 }
